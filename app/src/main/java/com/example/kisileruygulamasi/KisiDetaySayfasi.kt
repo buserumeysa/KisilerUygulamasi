@@ -26,7 +26,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kisileruygulamasi.entity.Kisiler
+import com.example.kisileruygulamasi.viewModel.DetaySayfasiViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,8 +36,9 @@ import com.example.kisileruygulamasi.entity.Kisiler
 fun KisiDetaySayfasi(gelenKisiler: Kisiler) {
     val tfKisiAd = remember { mutableStateOf("") }
     val tfKisiTel = remember { mutableStateOf("") }
+    val viewModel:DetaySayfasiViewModel= viewModel()
     val localFocusManager = LocalFocusManager.current
-    LaunchedEffect(key1 = true, ){
+    LaunchedEffect(key1 = true ){
         tfKisiAd.value=gelenKisiler.kisiAdi
         tfKisiTel.value=gelenKisiler.kisiTel
     }
@@ -66,7 +69,8 @@ fun KisiDetaySayfasi(gelenKisiler: Kisiler) {
             Button(onClick = {
                 val kisiAdi = tfKisiAd.value
                 val kisiTel = tfKisiTel.value
-                Log.e("KisiGüncelle", "${gelenKisiler.kisiId}- $kisiAdi - $kisiTel")
+                viewModel.guncelle(gelenKisiler.kisiId,kisiTel,kisiAdi)
+
                 localFocusManager.clearFocus()
             }, modifier = Modifier.size(250.dp, 50.dp)) {
                 Text(text = "Güncelle")

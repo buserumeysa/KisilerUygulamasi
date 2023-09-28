@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -44,6 +46,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.kisileruygulamasi.entity.Kisiler
 import com.example.kisileruygulamasi.ui.theme.KisilerUygulamasiTheme
+import com.example.kisileruygulamasi.viewModel.AnasayfaViewModel
+import com.example.kisileruygulamasi.viewModel.DetaySayfasiViewModel
 import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
@@ -99,20 +103,16 @@ fun SayfaGecisleri() {
 fun Anasayfa(navController: NavController) {
     val aramaKontrol = remember { mutableStateOf(false) }
     val aramaSonuc = remember { mutableStateOf("") }
-    val kisiListesi = remember { mutableStateListOf<Kisiler>() }
-    LaunchedEffect(key1 = true) {
-        val k1 = Kisiler(1, "Betül", "9453")
-        val k2 = Kisiler(2, "Buse", "9124")
-        kisiListesi.add(k1)
-        kisiListesi.add(k2)
-    }
+    val viewModel: AnasayfaViewModel = viewModel()
+    val kisiListesi = viewModel.kisilerListesi.observeAsState(listOf())
+
     Scaffold(topBar = {
         TopAppBar(title = {
             if (aramaKontrol.value) {
                 TextField(
                     value = aramaSonuc.value, onValueChange = {
                         aramaSonuc.value = it
-                        Log.e("Kisi", it)
+                       viewModel.ara(it)
                     },
                     label = {
                         Text(text = "Ara")
@@ -165,9 +165,9 @@ fun Anasayfa(navController: NavController) {
     }, content = {
         LazyColumn(modifier = Modifier.padding(vertical = 55.dp)) {
             items(
-                count = kisiListesi.count(),
+                count = kisiListesi.value!!.count(),
                 itemContent = {
-                    val kisi = kisiListesi[it]
+                    val kisi = kisiListesi.value!![it]
                     Card(
                         modifier = Modifier
                             .padding(all = 5.dp)
@@ -175,7 +175,7 @@ fun Anasayfa(navController: NavController) {
                     ) {
                         Row(modifier = Modifier.clickable {
                             val kisiJson=Gson().toJson(kisi)
-                            navController.navigate("detaySayfasi/{kisi}")
+                            navController.navigate("detaySayfasi/${kisiJson}")
 
                         }) {
                             Row(
@@ -186,7 +186,7 @@ fun Anasayfa(navController: NavController) {
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(text = "${kisi.kisiAdi}-${kisi.kisiTel}")
-                                IconButton(onClick = { Log.e("kişi sil", "${kisi.kisiId}") }) {
+                                IconButton(onClick = { viewModel.sil(kisi.kisiId) }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.silme_icon),
                                         contentDescription = "",
