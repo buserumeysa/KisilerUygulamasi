@@ -1,6 +1,7 @@
 package com.example.kisileruygulamasi
 
 import android.annotation.SuppressLint
+import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,10 +19,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.kisileruygulamasi.viewModel.AnasayfaViewModel
 import com.example.kisileruygulamasi.viewModel.KayitSayfasiViewModel
+import com.example.kisileruygulamasi.viewmodelfactory.AnasayfaViewModelFactory
+import com.example.kisileruygulamasi.viewmodelfactory.KayitSayfasiViewModelFactory
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,7 +35,10 @@ fun KayitSayfasi() {
     val tfKisiAd = remember { mutableStateOf("") }
     val tfKisiTel = remember { mutableStateOf("") }
     val localFocusManager = LocalFocusManager.current
-    val viewModel:KayitSayfasiViewModel= viewModel()
+    val context = LocalContext.current
+    val viewModel: KayitSayfasiViewModel = viewModel(
+        factory = KayitSayfasiViewModelFactory(context.applicationContext as Application)
+    )
     Scaffold(topBar = {
         TopAppBar(
             title = { Text(text = "KİŞİLER") }, colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -51,9 +59,9 @@ fun KayitSayfasi() {
                 text = "Telefon Numarası Giriniz"
             )})
             Button(onClick = {
-                val kisiAdi=tfKisiAd.value
-                val kisiTel=tfKisiTel.value
-                viewModel.kayit(kisiAdi,kisiTel)
+                val kisi_adi=tfKisiAd.value
+                val kisi_tel=tfKisiTel.value
+                viewModel.kayit(kisi_adi,kisi_tel)
                 localFocusManager.clearFocus()
             }, modifier = Modifier.size(250.dp,50.dp)) {
                 Text(text = "KAYDET")

@@ -1,6 +1,7 @@
 package com.example.kisileruygulamasi
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -33,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +50,7 @@ import com.example.kisileruygulamasi.entity.Kisiler
 import com.example.kisileruygulamasi.ui.theme.KisilerUygulamasiTheme
 import com.example.kisileruygulamasi.viewModel.AnasayfaViewModel
 import com.example.kisileruygulamasi.viewModel.DetaySayfasiViewModel
+import com.example.kisileruygulamasi.viewmodelfactory.AnasayfaViewModelFactory
 import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
@@ -103,8 +106,15 @@ fun SayfaGecisleri() {
 fun Anasayfa(navController: NavController) {
     val aramaKontrol = remember { mutableStateOf(false) }
     val aramaSonuc = remember { mutableStateOf("") }
-    val viewModel: AnasayfaViewModel = viewModel()
+    val context = LocalContext.current
+    val viewModel: AnasayfaViewModel = viewModel(
+        factory = AnasayfaViewModelFactory(context.applicationContext as Application)
+    )
     val kisiListesi = viewModel.kisilerListesi.observeAsState(listOf())
+    LaunchedEffect(key1 = true ){
+        viewModel.kisiYukle()
+    }
+
 
     Scaffold(topBar = {
         TopAppBar(title = {
@@ -120,7 +130,7 @@ fun Anasayfa(navController: NavController) {
                         containerColor = Color.Transparent,
                         focusedIndicatorColor = Color.White,
                         unfocusedIndicatorColor = Color.White,
-                        textColor = Color.Black,
+                        textColor = Color.White,
                         focusedLabelColor = Color.White,
                         unfocusedLabelColor = Color.White,
                     )
@@ -185,8 +195,8 @@ fun Anasayfa(navController: NavController) {
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(text = "${kisi.kisiAdi}-${kisi.kisiTel}")
-                                IconButton(onClick = { viewModel.sil(kisi.kisiId) }) {
+                                Text(text = "${kisi.kisi_adi}-${kisi.kisi_tel}")
+                                IconButton(onClick = { viewModel.sil(kisi.kisi_id) }) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.silme_icon),
                                         contentDescription = "",

@@ -1,6 +1,7 @@
 package com.example.kisileruygulamasi
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,12 +24,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kisileruygulamasi.entity.Kisiler
+import com.example.kisileruygulamasi.viewModel.AnasayfaViewModel
 import com.example.kisileruygulamasi.viewModel.DetaySayfasiViewModel
+import com.example.kisileruygulamasi.viewmodelfactory.AnasayfaViewModelFactory
+import com.example.kisileruygulamasi.viewmodelfactory.DetaySayfasiViewModelFactory
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,11 +41,14 @@ import com.example.kisileruygulamasi.viewModel.DetaySayfasiViewModel
 fun KisiDetaySayfasi(gelenKisiler: Kisiler) {
     val tfKisiAd = remember { mutableStateOf("") }
     val tfKisiTel = remember { mutableStateOf("") }
-    val viewModel:DetaySayfasiViewModel= viewModel()
+    val context = LocalContext.current
+    val viewModel: DetaySayfasiViewModel = viewModel(
+        factory = DetaySayfasiViewModelFactory(context.applicationContext as Application)
+    )
     val localFocusManager = LocalFocusManager.current
     LaunchedEffect(key1 = true ){
-        tfKisiAd.value=gelenKisiler.kisiAdi
-        tfKisiTel.value=gelenKisiler.kisiTel
+        tfKisiAd.value=gelenKisiler.kisi_adi
+        tfKisiTel.value=gelenKisiler.kisi_tel
     }
 
     Scaffold(topBar = {
@@ -67,9 +75,9 @@ fun KisiDetaySayfasi(gelenKisiler: Kisiler) {
                 )
             })
             Button(onClick = {
-                val kisiAdi = tfKisiAd.value
-                val kisiTel = tfKisiTel.value
-                viewModel.guncelle(gelenKisiler.kisiId,kisiTel,kisiAdi)
+                val kisi_adi = tfKisiAd.value
+                val kisi_tel = tfKisiTel.value
+                viewModel.guncelle(gelenKisiler.kisi_id,kisi_adi,kisi_tel)
 
                 localFocusManager.clearFocus()
             }, modifier = Modifier.size(250.dp, 50.dp)) {
